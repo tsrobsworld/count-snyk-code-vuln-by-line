@@ -112,22 +112,22 @@ class SnykAPI:
         next_params = params
         while next_url:
             try:
-            response = self.session.get(next_url, params=next_params)
-            response.raise_for_status()
-            data = response.json()
-            all_data.extend(data.get('data', []))
-            links = data.get('links', {})
-            next_url = links.get('next')
-            next_params = None
-            if next_url:
-                if next_url.startswith('http'):
-                    pass  # use as-is
-                elif next_url.startswith('/'):
-                    next_url = self.base_url + next_url
+                response = self.session.get(next_url, params=next_params)
+                response.raise_for_status()
+                data = response.json()
+                all_data.extend(data.get('data', []))
+                links = data.get('links', {})
+                next_url = links.get('next')
+                next_params = None
+                if next_url:
+                    if next_url.startswith('http'):
+                        pass  # use as-is
+                    elif next_url.startswith('/'):
+                        next_url = self.base_url + next_url
+                    else:
+                        next_url = self.base_url + '/' + next_url.lstrip('/')
                 else:
-                    next_url = self.base_url + '/' + next_url.lstrip('/')
-            else:
-                next_url = None
+                    next_url = None
             except requests.exceptions.RequestException as e:
                 print(f"   ❌ Error fetching issues for org {org_id}: {e}")
                 if hasattr(e, 'response') and e.response is not None:
@@ -158,22 +158,22 @@ class SnykAPI:
         next_params = params
         while next_url:
             try:
-            response = self.session.get(next_url, params=next_params)
-            response.raise_for_status()
-            data = response.json()
+                response = self.session.get(next_url, params=next_params)
+                response.raise_for_status()
+                data = response.json()
                 all_orgs.extend(data.get('data', []))
-            links = data.get('links', {})
-            next_url = links.get('next')
-            next_params = None
-            if next_url:
-                if next_url.startswith('http'):
+                links = data.get('links', {})
+                next_url = links.get('next')
+                next_params = None
+                if next_url:
+                    if next_url.startswith('http'):
                         pass
-                elif next_url.startswith('/'):
-                    next_url = self.base_url + next_url
+                    elif next_url.startswith('/'):
+                        next_url = self.base_url + next_url
+                    else:
+                        next_url = self.base_url + '/' + next_url.lstrip('/')
                 else:
-                    next_url = self.base_url + '/' + next_url.lstrip('/')
-            else:
-                next_url = None
+                    next_url = None
             except requests.exceptions.RequestException as e:
                 print(f"   ❌ Error fetching orgs for group {group_id}: {e}")
                 if hasattr(e, 'response') and e.response is not None:
@@ -374,7 +374,7 @@ def process_org_issues(snyk_api: SnykAPI, org_id: str, org_slug: str, verbose: b
                 if verbose:
                     print(f"   ⚠️  Unknown severity '{severity}' for issue {issue_id}")
                 skipped_count += 1
-                    continue
+                continue
                 
             processed_count += 1
             
@@ -507,7 +507,7 @@ Examples:
     if not args.group_id and not args.org_id:
         print("❌ Error: Either --group-id or --org-id must be specified")
         parser.print_help()
-            sys.exit(1)
+        sys.exit(1)
     
     if args.group_id and args.org_id:
         print("❌ Error: Cannot specify both --group-id and --org-id. Use one or the other.")
@@ -550,7 +550,7 @@ Examples:
             org_slug = org_attributes.get('slug', org_id)
             if org_id:
                 orgs_to_process.append({'id': org_id, 'slug': org_slug})
-    if args.verbose:
+                if args.verbose:
                     print(f"   📋 Will process: {org_slug} ({org_id})")
     
     elif args.org_id:
